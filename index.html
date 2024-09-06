@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard do aluno</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header com Perfil -->
+        <header class="profile-header">
+            <img src="foto.png" alt="Profile Picture" class="profile-img">
+            <div class="profile-info">
+                <h1>Ana Luíza De Souza</h1>
+                <p>CPF: 123456789</p>
+            </div>
+            <a href="#" class="logout">SAIR</a>
+        </header>
+
+        <!-- Navegação entre meses -->
+        <nav class="month-navigation">
+            <button class="nav-button" onclick="changeMonth(-1)">&lt;</button>
+            <button id="month-Janeiro" class="month-button" onclick="showMonth('Janeiro')">JANEIRO</button>
+            <button id="month-Fevereiro" class="month-button" onclick="showMonth('Fevereiro')">FEVEREIRO</button>
+            <button id="month-Março" class="month-button" onclick="showMonth('Março')">MARÇO</button>
+            <button id="month-Abril" class="month-button" onclick="showMonth('Abril')">ABRIL</button>
+            <button id="month-Maio" class="month-button" onclick="showMonth('Maio')">MAIO</button>
+            <button id="month-Junho" class="month-button" onclick="showMonth('Junho')">JUNHO</button>
+            <button id="month-Julho" class="month-button" onclick="showMonth('Julho')">JULHO</button>
+            <button id="month-Agosto" class="month-button" onclick="showMonth('Agosto')">AGOSTO</button>
+            <button id="month-Setembro" class="month-button" onclick="showMonth('Setembro')">SETEMBRO</button>
+            <button id="month-Outubro" class="month-button" onclick="showMonth('Outubro')">OUTUBRO</button>
+            <button id="month-Novembro" class="month-button" onclick="showMonth('Novembro')">NOVEMBRO</button>
+            <button id="month-Dezembro" class="month-button" onclick="showMonth('Dezembro')">DEZEMBRO</button>
+            <button class="nav-button" onclick="changeMonth(1)">&gt;</button>
+        </nav>
+
+        <!-- Tabela de Presença -->
+        <section class="table-section">
+            <div class="table-header">
+                <h2>Presença</h2>
+                <p>Controle de Presença</p>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>DATA</th>
+                        <th>STATUS</th>
+                        <th>ENTRADA</th>
+                        <th>SAÍDA</th>
+                    </tr>
+                </thead>
+                <tbody id="presence-table-body">
+                    <!-- Dados da Tabela de Presença serão inseridos aqui pelo JavaScript -->
+                </tbody>
+            </table>
+            
+            <!-- Paginação e Ações -->
+            <div class="table-footer">
+                <div class="items-per-page">
+                    <label for="items">Items per page:</label>
+                    <select id="items" onchange="updateItemsPerPage()">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+                <div class="pagination">
+                    <span id="page-info">Página 1 de 1</span>
+                    <button class="nav-button" onclick="changePage(-1)">&lt;</button>
+                    <button class="nav-button" onclick="changePage(1)">&gt;</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tabela de Faltas -->
+        <section class="table-section">
+            <div class="table-header">
+                <h2>Falta</h2>
+                <p>Controle de Falta</p>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>DATA</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="absence-table-body">
+                    <!-- Dados da Tabela de Faltas serão inseridos aqui pelo JavaScript -->
+                </tbody>
+            </table>
+            
+            <!-- Paginação e Ações -->
+            <div class="table-footer">
+                <div class="items-per-page">
+                    <label for="items">Items per page:</label>
+                    <select id="items" onchange="updateItemsPerPage()">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+                <div class="pagination">
+                    <span id="page-info">Página 1 de 1</span>
+                    <button class="nav-button" onclick="changePage(-1)">&lt;</button>
+                    <button class="nav-button" onclick="changePage(1)">&gt;</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+        <img src="projeta.png" alt="Logo" class="logo">
+        <p>&copy; 2024 Sua Empresa. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        function generateUniqueYearlyData(statuses, entryTime, exitTime) {
+            const data = {};
+            const months = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+
+            months.forEach((month, monthIndex) => {
+                const daysInMonth = new Date(2024, monthIndex + 1, 0).getDate();
+                const allDays = Array.from({ length: daysInMonth }, (_, dayIndex) => ({
+                    date: `${String(dayIndex + 1).padStart(2, '0')}/${monthIndex + 1}/2024`,
+                    entry: entryTime || '',
+                    exit: exitTime || ''
+                }));
+
+                // Distribui aleatoriamente as datas entre as duas tabelas
+                const shuffledDays = allDays.sort(() => Math.random() - 0.5);
+                const presenceDays = shuffledDays.slice(0, Math.floor(shuffledDays.length / 2));
+                const absenceDays = shuffledDays.slice(Math.floor(shuffledDays.length / 2));
+
+                // Ordena os dias para garantir a ordem correta
+                data[month] = {
+                    presence: presenceDays.map(day => ({
+                        ...day,
+                        status: statuses.presence
+                    })).sort((a, b) => new Date(a.date.split('/').reverse().join('/')) - new Date(b.date.split('/').reverse().join('/'))),
+                    absence: absenceDays.map(day => ({
+                        ...day,
+                        status: statuses.absence
+                    })).sort((a, b) => new Date(a.date.split('/').reverse().join('/')) - new Date(b.date.split('/').reverse().join('/')))
+                };
+            });
+
+            return data;
+        }
+
+        const statuses = {
+            presence: 'Presença',
+            absence: 'Falta'
+        };
+
+        const yearlyData = generateUniqueYearlyData(statuses, '13:00', '15:00');
+
+        let currentMonth = 'Janeiro';
+        let currentPage = 1;
+        let itemsPerPage = 5;
+
+        function showMonth(month) {
+            currentMonth = month;
+            updateTable();
+            updateMonthButtons();
+        }
+
+        function changeMonth(direction) {
+            const months = Object.keys(yearlyData);
+            let currentIndex = months.indexOf(currentMonth);
+            currentIndex = (currentIndex + direction + months.length) % months.length;
+            showMonth(months[currentIndex]);
+        }
+
+        function updateTable() {
+            const presenceTableBody = document.getElementById('presence-table-body');
+            const absenceTableBody = document.getElementById('absence-table-body');
+
+            const presenceDataForMonth = yearlyData[currentMonth].presence || [];
+            const absenceDataForMonth = yearlyData[currentMonth].absence || [];
+
+            // Atualizar Tabela de Presença
+            presenceTableBody.innerHTML = presenceDataForMonth
+                .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                .map(item => `
+                    <tr>
+                        <td>${item.date}</td>
+                        <td>${item.status}</td>
+                        <td>${item.entry}</td>
+                        <td>${item.exit}</td>
+                    </tr>
+                `).join('');
+
+            // Atualizar Tabela de Faltas
+            absenceTableBody.innerHTML = absenceDataForMonth
+                .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                .map(item => `
+                    <tr>
+                        <td>${item.date}</td>
+                        <td>${item.status}</td>
+                    </tr>
+                `).join('');
+
+            // Atualizar Informação da Página
+            document.getElementById('page-info').innerText = `Página ${currentPage} de ${Math.ceil(presenceDataForMonth.length / itemsPerPage)}`;
+
+            // Atualizar Estados dos Botões
+            document.querySelector('.pagination .nav-button:first-child').disabled = currentPage === 1;
+            document.querySelector('.pagination .nav-button:last-child').disabled = currentPage === Math.ceil(presenceDataForMonth.length / itemsPerPage);
+        }
+
+        function changePage(direction) {
+            const totalPages = Math.ceil((yearlyData[currentMonth].presence || []).length / itemsPerPage);
+            currentPage = Math.max(1, Math.min(currentPage + direction, totalPages));
+            updateTable();
+        }
+
+        function updateItemsPerPage() {
+            itemsPerPage = parseInt(document.getElementById('items').value);
+            updateTable();
+        }
+
+        function updateMonthButtons() {
+            const monthButtons = document.querySelectorAll('.month-button');
+            monthButtons.forEach(button => {
+                button.classList.toggle('active', button.id === `month-${currentMonth}`);
+            });
+        }
+
+        // Inicializar
+        showMonth(currentMonth);
+    </script>
+</body>
+</html>
